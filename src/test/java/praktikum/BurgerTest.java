@@ -1,0 +1,251 @@
+package praktikum;
+
+import org.hamcrest.MatcherAssert;
+import org.junit.Test;
+import org.mockito.Mockito;
+
+import java.util.List;
+
+import static org.hamcrest.CoreMatchers.is;
+
+public class BurgerTest {
+    @Test
+    public void testSetBuns() {
+        Burger burger = new Burger();
+
+        Bun bun = Mockito.mock(Bun.class);
+        burger.setBuns(bun);
+        MatcherAssert.assertThat("Поле bun не равно устанавливаемому объекту", burger.bun, is(bun));
+    }
+
+    @Test
+    public void testAddIngredient() {
+        Burger burger = new Burger();
+
+        Ingredient ingredient = Mockito.mock(Ingredient.class);
+        burger.addIngredient(ingredient);
+        MatcherAssert.assertThat("Поле ingredients не равно ожидаемому результату", burger.ingredients, is(List.of(ingredient)));
+    }
+
+    @Test
+    public void testRemoveIngredient() {
+        Burger burger = new Burger();
+
+        Ingredient firstIngredient = Mockito.mock(Ingredient.class);
+        Ingredient secondIngredient = Mockito.mock(Ingredient.class);
+        burger.addIngredient(firstIngredient);
+        burger.addIngredient(secondIngredient);
+
+        burger.removeIngredient(0);
+
+        MatcherAssert.assertThat("Поле ingredients не равно ожидаемому результату", burger.ingredients, is(List.of(secondIngredient)));
+    }
+
+    @Test
+    public void testMoveIngredient() {
+        Burger burger = new Burger();
+
+        Ingredient firstIngredient = Mockito.mock(Ingredient.class);
+        Ingredient secondIngredient = Mockito.mock(Ingredient.class);
+        burger.addIngredient(firstIngredient);
+        burger.addIngredient(secondIngredient);
+
+        burger.moveIngredient(0, 1);
+
+        MatcherAssert.assertThat("Поле ingredients не равно ожидаемому результату", burger.ingredients, is(List.of(secondIngredient, firstIngredient)));
+    }
+
+    @Test
+    public void testGetPriceCalculation() {
+        Burger burger = new Burger();
+
+        // Создаем Мок класса Bun
+        Bun bun = Mockito.mock(Bun.class);
+        // Создаем Мок класса Ingredient
+        Ingredient ingredient = Mockito.mock(Ingredient.class);
+
+        burger.setBuns(bun);
+        burger.addIngredient(ingredient);
+
+        Mockito.when(bun.getPrice()).thenReturn(100F);
+        Mockito.when(ingredient.getPrice()).thenReturn(50F);
+
+        MatcherAssert.assertThat("Итоговая цена не соответствует ожидаемой", burger.getPrice(), is(250F));
+    }
+
+    @Test
+    public void testGetPriceOfBunTimes() {
+        Burger burger = new Burger();
+
+        // Создаем Мок класса Bun
+        Bun bun = Mockito.mock(Bun.class);
+        // Создаем Мок класса Ingredient
+        Ingredient ingredient = Mockito.mock(Ingredient.class);
+
+        burger.setBuns(bun);
+        burger.addIngredient(ingredient);
+
+        Mockito.when(bun.getPrice()).thenReturn(100F);
+        Mockito.when(ingredient.getPrice()).thenReturn(50F);
+
+        burger.getPrice();
+
+        Mockito.verify(bun, Mockito.times(1)).getPrice();
+    }
+
+    @Test
+    public void testGetPriceOfIngredientTimes() {
+        Burger burger = new Burger();
+
+        // Создаем Мок класса Bun
+        Bun bun = Mockito.mock(Bun.class);
+        // Создаем Мок класса Ingredient
+        Ingredient ingredient = Mockito.mock(Ingredient.class);
+
+        burger.setBuns(bun);
+        burger.addIngredient(ingredient);
+
+        Mockito.when(bun.getPrice()).thenReturn(100F);
+        Mockito.when(ingredient.getPrice()).thenReturn(50F);
+
+        burger.getPrice();
+
+        Mockito.verify(ingredient, Mockito.times(1)).getPrice();
+    }
+
+    @Test
+    public void testGetReceiptResult() {
+        Burger burger = Mockito.spy(Burger.class);
+
+        // Создаем Мок класса Bun
+        Bun bun = Mockito.mock(Bun.class);
+        // Создаем Мок класса Ingredient
+        Ingredient ingredient = Mockito.mock(Ingredient.class);
+
+        burger.setBuns(bun);
+        burger.addIngredient(ingredient);
+
+        Mockito.when(bun.getName()).thenReturn("bun");
+        Mockito.when(ingredient.getType()).thenReturn(IngredientType.SAUCE);
+        Mockito.when(ingredient.getName()).thenReturn("chili");
+        Mockito.when(burger.getPrice()).thenReturn(250F);
+
+        String expectedReceiptBuilder = String.format("(==== bun ====)%n") +
+                String.format("= sauce chili =%n") +
+                String.format("(==== bun ====)%n") +
+                String.format("%nPrice: 250,000000%n");
+
+        MatcherAssert.assertThat("Возвращенный рецепт не соответствует ожидаемому", burger.getReceipt(), is(expectedReceiptBuilder));
+
+    }
+
+    @Test
+    public void testGetNameOfBunTimesInGetReceipt() {
+            Burger burger = Mockito.spy(Burger.class);
+
+            // Создаем Мок класса Bun
+            Bun bun = Mockito.mock(Bun.class);
+            // Создаем Мок класса Ingredient
+            Ingredient ingredient = Mockito.mock(Ingredient.class);
+
+            burger.setBuns(bun);
+            burger.addIngredient(ingredient);
+
+            Mockito.when(bun.getName()).thenReturn("bun");
+            Mockito.when(ingredient.getType()).thenReturn(IngredientType.SAUCE);
+            Mockito.when(ingredient.getName()).thenReturn("chili");
+            Mockito.when(burger.getPrice()).thenReturn(250F);
+
+            String expectedReceiptBuilder = String.format("(==== bun ====)%n") +
+                    String.format("= sauce chili =%n") +
+                    String.format("(==== bun ====)%n") +
+                    String.format("%nPrice: 250,000000%n");
+
+            burger.getReceipt();
+
+            Mockito.verify(bun, Mockito.times(2)).getName();
+    }
+
+    @Test
+    public void testGetTypeOfIngredientsTimesInGetReceipt() {
+        Burger burger = Mockito.spy(Burger.class);
+
+        // Создаем Мок класса Bun
+        Bun bun = Mockito.mock(Bun.class);
+        // Создаем Мок класса Ingredient
+        Ingredient ingredient = Mockito.mock(Ingredient.class);
+
+        burger.setBuns(bun);
+        burger.addIngredient(ingredient);
+
+        Mockito.when(bun.getName()).thenReturn("bun");
+        Mockito.when(ingredient.getType()).thenReturn(IngredientType.SAUCE);
+        Mockito.when(ingredient.getName()).thenReturn("chili");
+        Mockito.when(burger.getPrice()).thenReturn(250F);
+
+        String expectedReceiptBuilder = String.format("(==== bun ====)%n") +
+                String.format("= sauce chili =%n") +
+                String.format("(==== bun ====)%n") +
+                String.format("%nPrice: 250,000000%n");
+
+        burger.getReceipt();
+
+        Mockito.verify(ingredient, Mockito.times(1)).getType();
+    }
+
+    @Test
+    public void testGetNameOfIngredientsTimesInGetReceipt() {
+        Burger burger = Mockito.spy(Burger.class);
+
+        // Создаем Мок класса Bun
+        Bun bun = Mockito.mock(Bun.class);
+        // Создаем Мок класса Ingredient
+        Ingredient ingredient = Mockito.mock(Ingredient.class);
+
+        burger.setBuns(bun);
+        burger.addIngredient(ingredient);
+
+        Mockito.when(bun.getName()).thenReturn("bun");
+        Mockito.when(ingredient.getType()).thenReturn(IngredientType.SAUCE);
+        Mockito.when(ingredient.getName()).thenReturn("chili");
+        Mockito.when(burger.getPrice()).thenReturn(250F);
+
+        String expectedReceiptBuilder = String.format("(==== bun ====)%n") +
+                String.format("= sauce chili =%n") +
+                String.format("(==== bun ====)%n") +
+                String.format("%nPrice: 250,000000%n");
+
+        burger.getReceipt();
+
+        Mockito.verify(ingredient, Mockito.times(1)).getName();
+    }
+
+    @Test
+    public void testGetPriceOfBurgerTimesInGetReceipt() {
+        Burger burger = Mockito.spy(Burger.class);
+
+        // Создаем Мок класса Bun
+        Bun bun = Mockito.mock(Bun.class);
+        // Создаем Мок класса Ingredient
+        Ingredient ingredient = Mockito.mock(Ingredient.class);
+
+        burger.setBuns(bun);
+        burger.addIngredient(ingredient);
+
+        Mockito.when(bun.getName()).thenReturn("bun");
+        Mockito.when(ingredient.getType()).thenReturn(IngredientType.SAUCE);
+        Mockito.when(ingredient.getName()).thenReturn("chili");
+        Mockito.when(burger.getPrice()).thenReturn(250F);
+
+        String expectedReceiptBuilder = String.format("(==== bun ====)%n") +
+                String.format("= sauce chili =%n") +
+                String.format("(==== bun ====)%n") +
+                String.format("%nPrice: 250,000000%n");
+
+        burger.getReceipt();
+
+        Mockito.verify(burger, Mockito.times(1)).getPrice();
+    }
+}
+
+
